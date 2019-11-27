@@ -1,7 +1,7 @@
 ## AWS env managed by pulumi
 <br>
 
-Create a __main__.py file and use the classes provided
+Create a \_\_main__.py file and use the classes provided
 
 <br>
 
@@ -31,5 +31,5 @@ subnet_id = network.public_subnets[0]
 
 server = Server(server_name, security_groups=[network.public_sg], tags=server_tags, subnet_id=subnet_id, key_name = None)
 ```
-pulumi up
+
 

@@ -2,7 +2,8 @@ from pulumi.resource import ComponentResource, ResourceOptions
 from pulumi.errors import RunError
 from pulumi_aws import ec2
 import pulumi_aws
-import requests
+
+import util.Util as Util
 
 class Network(ComponentResource):
     """
@@ -93,12 +94,6 @@ class Network(ComponentResource):
         zones = pulumi_aws.get_availability_zones()
         return zones.zone_ids[index]
 
-    def _get_inbound_ip(self):
-        pass
-        # TODO: do we want to bootstrap the rules with an IP of the caller?
-        ip = requests.get("http://ifconfig.me/ip")
-        return ip.text
-
     def _create_public_subnet_route_table(self, vpcid):
         # create the public subnet for the NAT
         ig_name = "%s-ig" % self.name
@@ -169,7 +164,7 @@ class Network(ComponentResource):
         pub_egress = ec2.SecurityGroupRule("public-egress", type="egress", cidr_blocks=["0.0.0.0/0"], from_port=0,
                                            to_port=0, protocol=-1, security_group_id=public_sg.id, description="egress traffic from public sg", __opts__= ResourceOptions(parent=self))
 
-        current_ip = self._get_inbound_ip()
+        current_ip = Util.get_workstation_ip()
         pub_ingress_current_ip = ec2.SecurityGroupRule("public-ingress-from-current-ip", type="ingress", from_port=22, to_port=22,
                                                        protocol="TCP", security_group_id=public_sg.id, cidr_blocks=[("%s/32" % current_ip)], __opts__= ResourceOptions(parent=self))
         """

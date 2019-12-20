@@ -1,6 +1,7 @@
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
+import requests
 
 
 def create_bastion_to_private_keypair():
@@ -11,3 +12,7 @@ def create_bastion_to_private_keypair():
                                                          serialization.PrivateFormat.PKCS8, serialization.NoEncryption())
 
     return {'public': public_key_string.decode('utf-8'), 'private': private_key_string.decode('utf-8')}
+
+def get_workstation_ip():
+    ip = requests.get("http://ifconfig.me/ip")
+    return ip.text

@@ -32,4 +32,5 @@ subnet_id = network.public_subnets[0]
 server = Server(server_name, security_groups=[network.public_sg], tags=server_tags, subnet_id=subnet_id, key_name = None)
 ```
 
-
+### TODO
+1. create the config map to add the nodes to the cluster

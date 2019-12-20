@@ -12,7 +12,7 @@ class Server(ComponentResource):
     :param tags A dictionary of tags to attach to the instance
     """
     def __init__(self, name, size="t2.micro", security_groups=None, tags=None, subnet_id=None, key=None, user_data_dict=None):
-        ComponentResource.__init__(self, "aws:compute:dtd", name, None, None)
+        ComponentResource.__init__(self, "aws:compute:server", name, None, None)
 
         type = tags['type']
 
@@ -54,5 +54,3 @@ def _get_public_ip(type):
     else:
         return False
 
-# TODO: method to create keypair for private ec2s. The private should be injected to this via userdata.
-# public should be returned for injecting into the others.

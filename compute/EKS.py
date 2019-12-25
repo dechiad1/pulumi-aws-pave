@@ -156,29 +156,29 @@ set -o xtrace
 
         # Create the egress/ingress rules for the master
         master_sg_egress = ec2.SecurityGroupRule("master-sg-egress", type="egress", cidr_blocks=["0.0.0.0/0"], from_port=0,
-                                                 to_port=0, protocol=-1, security_group_id=master_sg.id,
+                                                 to_port=0, protocol=-1, security_group_id=master_sg.id, description="master sg egress",
                                                  __opts__=ResourceOptions(parent=self))
         current_ip = Util.get_workstation_ip()
         master_sg_ingress_workstation = ec2.SecurityGroupRule("master-sg-ingress-from-workstation", type="ingress", from_port=443, to_port=443,
                                                               protocol=-1, security_group_id=master_sg.id, cidr_blocks=["%s/32" % current_ip],
-                                                              __opts__=ResourceOptions(parent=self))
+                                                              description="ingress to masters from workstation", __opts__=ResourceOptions(parent=self))
         master_sg_ingress_nodes = ec2.SecurityGroupRule("master-sg-ingress-from-workers", type="ingress", from_port=0, to_port=0,
                                                         protocol=-1, security_group_id=master_sg.id, source_security_group_id=worker_sg.id,
-                                                        __opts__=ResourceOptions(parent=self))
+                                                        description="master ingress from workers", __opts__=ResourceOptions(parent=self))
 
         # Create the egress/ingress rules for the workers
         worker_sg_egress = ec2.SecurityGroupRule("worker-sg-egress", type="egress", cidr_blocks=["0.0.0.0/0"], from_port=0,
-                                             to_port=0, protocol=-1, security_group_id=worker_sg.id,
+                                             to_port=0, protocol=-1, security_group_id=worker_sg.id, description="worker sg egress",
                                              __opts__=ResourceOptions(parent=self))
         worker_sg_ingress_itself = ec2.SecurityGroupRule("worker-sg-ingress-itself", type="ingress", from_port=0, to_port=0,
-                                                         protocol=-1, security_group_id=worker_sg.id, self=True,
+                                                         protocol=-1, security_group_id=worker_sg.id, self=True, description="worker ingress from itself",
                                                          __opts__=ResourceOptions(parent=self))
         worker_sg_ingress_master = ec2.SecurityGroupRule("worker-sg-ingress-master", type="ingress", from_port=0, to_port=0,
                                                          protocol=-1, security_group_id=worker_sg.id, source_security_group_id=master_sg.id,
-                                                         __opts__=ResourceOptions(parent=self))
+                                                         description="worker ingress from master", __opts__=ResourceOptions(parent=self))
         worker_sg_ingress_bastion = ec2.SecurityGroupRule("worker-sg-ingress-bastion", type="ingress", from_port=0, to_port=0,
                                                           protocol=-1, security_group_id=worker_sg.id, source_security_group_id=bastion_id,
-                                                          __opts__=ResourceOptions(parent=self))
+                                                          description="worker ingress from bastion host", __opts__=ResourceOptions(parent=self))
 
         self.master_sg = master_sg.id
         self.worker_sg = worker_sg.id

@@ -156,17 +156,21 @@ class Network(ComponentResource):
             4. ingress rule for current IP address on 22
         """
         pub_ingress_itself = ec2.SecurityGroupRule("public-ingress-from-itself", type="ingress", from_port=0, to_port=0,
-                                                   protocol=-1, security_group_id=public_sg.id, self=True, __opts__= ResourceOptions(parent=self))
+                                                   protocol=-1, security_group_id=public_sg.id, self=True, description="public ingress to/from itself",
+                                                   __opts__= ResourceOptions(parent=self))
 
         pub_ingress_private = ec2.SecurityGroupRule("public-ingress-from-private", type="ingress", from_port=0, to_port=0,
-                                                    protocol=-1, security_group_id=public_sg.id, source_security_group_id=private_sg.id, __opts__= ResourceOptions(parent=self))
+                                                    protocol=-1, security_group_id=public_sg.id, source_security_group_id=private_sg.id,
+                                                    description="public ingress from private", __opts__= ResourceOptions(parent=self))
 
         pub_egress = ec2.SecurityGroupRule("public-egress", type="egress", cidr_blocks=["0.0.0.0/0"], from_port=0,
-                                           to_port=0, protocol=-1, security_group_id=public_sg.id, description="egress traffic from public sg", __opts__= ResourceOptions(parent=self))
+                                           to_port=0, protocol=-1, security_group_id=public_sg.id, description="egress traffic from public sg",
+                                           __opts__= ResourceOptions(parent=self))
 
         current_ip = Util.get_workstation_ip()
         pub_ingress_current_ip = ec2.SecurityGroupRule("public-ingress-from-current-ip", type="ingress", from_port=22, to_port=22,
-                                                       protocol="TCP", security_group_id=public_sg.id, cidr_blocks=[("%s/32" % current_ip)], __opts__= ResourceOptions(parent=self))
+                                                       protocol="TCP", security_group_id=public_sg.id, cidr_blocks=[("%s/32" % current_ip)],
+                                                       description="ingress from current IP", __opts__= ResourceOptions(parent=self))
         """
         Set up private rules:
             1. ingress from public to it
@@ -174,12 +178,15 @@ class Network(ComponentResource):
             3. egress rule for all
         """
         priv_ingress_itself = ec2.SecurityGroupRule("private-ingress-from-itself", type="ingress", from_port=0, to_port=0,
-                                                   protocol=-1, security_group_id=private_sg.id, self=True, __opts__= ResourceOptions(parent=self))
+                                                    protocol=-1, security_group_id=private_sg.id, self=True, description="private ingress to itself",
+                                                    __opts__= ResourceOptions(parent=self))
 
-        priv_ingress_public = ec2.SecurityGroupRule("private-ingress-from-private", type="ingress", from_port=0, to_port=0,
-                                                protocol=-1, security_group_id=private_sg.id, source_security_group_id=public_sg.id, __opts__= ResourceOptions(parent=self))
+        priv_ingress_public = ec2.SecurityGroupRule("private-ingress-from-public", type="ingress", from_port=0, to_port=0,
+                                                    protocol=-1, security_group_id=private_sg.id, source_security_group_id=public_sg.id,
+                                                    description="private ingress from public", __opts__= ResourceOptions(parent=self))
 
         priv_egress = ec2.SecurityGroupRule("private-egress", type="egress", cidr_blocks=["0.0.0.0/0"], from_port=0,
-                                       to_port=0, protocol=-1, security_group_id=private_sg.id, description="egress traffic from private sg", __opts__= ResourceOptions(parent=self))
+                                            to_port=0, protocol=-1, security_group_id=private_sg.id,
+                                            description="egress traffic from private sg", __opts__= ResourceOptions(parent=self))
 
         return {"public": public_sg.id, "private": private_sg.id}
